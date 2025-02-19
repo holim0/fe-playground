@@ -1,7 +1,3 @@
-/**
- * @vitest-environment jsdom
- */
-
 import { describe, expect, it } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
 import useDebounceState from './useDebounceState';

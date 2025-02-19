@@ -4,9 +4,13 @@ import react from '@vitejs/plugin-react-swc'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({
+    jsxImportSource: "@emotion/react",
+  })],
 
   test: {
-    globals: true
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: "./src/setup.ts",
   }
 })
