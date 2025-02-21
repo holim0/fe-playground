@@ -1,8 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { renderHook, act, waitFor } from '@testing-library/react'
 import useDebounceState from './useDebounceState';
 
 describe('useDebounceState test', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
   it('should return same value with input.', () => {
     const { result } = renderHook(() => useDebounceState({value: 42, time: 1000}))
 
@@ -15,14 +22,15 @@ describe('useDebounceState test', () => {
       initialProps: {value: 50}
     })
 
-    rerender({value: 100})
+    rerender({ value: 100 })
     expect(result.current.debouncedState).toBe(50)
 
 
-    await waitFor(() => {
-      expect(result.current.debouncedState).toBe(100);
-    }, { timeout: 3000 }); // 여유 시간을 두어 debounce 시간이 충분히 지나도록 설정
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
 
+    expect(result.current.debouncedState).toBe(100);
   })
 
   it("should clear debounce", async () => {
@@ -34,13 +42,16 @@ describe('useDebounceState test', () => {
 
     expect(result.current.debouncedState).toBe(50)
 
-    await act(() => new Promise((resolve) => setTimeout(resolve, 200)))
-
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
     result.current.clearDebounce()
 
-    await waitFor(() => {
-      expect(result.current.debouncedState).toBe(50);
-    }, { timeout: 200 }); // 여유 시간을 두어 debounce 시간이 충분히 지나도록 설정
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+
+    expect(result.current.debouncedState).toBe(50)
 
   })
 })
